@@ -15,14 +15,14 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/Qapi")
+@RequestMapping("/Qapi/questions")
 public class QuestionRestController {
 
 
     @Autowired
     QuestionRepository questionRepository;
 
-    @GetMapping("/questions")
+    @GetMapping("/")
     public List<Question> getAllQuestions() {
         List<Question> questionList = questionRepository.findAll();
 
@@ -33,7 +33,7 @@ public class QuestionRestController {
         return questionList;
     }
 
-    @GetMapping("/questions/{question_id}")
+    @GetMapping("/{question_id}")
     public Question getAllQuestions(@PathVariable int question_id) {
         Optional<Question> question = questionRepository.findById(question_id);
 
@@ -47,23 +47,27 @@ public class QuestionRestController {
         }
     }
 
-    /*
-    @GetMapping("/questions/{difficulty}")
-    public List<Question> getQuestionsWithDiff(@PathVariable String difficulty) throws Exception {
+
+    @GetMapping("/difficulty/{difficulty}")
+    public List<Question> getQuestionsWithDiff(@PathVariable String difficulty) {
         List<Question> questionList = questionRepository.findAllByDifficulty(difficulty);
 
-        if(questionList != null)
+        if(questionList.size()==0)
         {
-            return questionList;
+            if(difficulty != "EASY" && difficulty != "MEDIUM" && difficulty != "HARD") {
+                System.out.println("-"+difficulty+"-");
+                throw new QuestionNotFound("Invalid difficulty: " + difficulty + ". Valid values - EASY, MEDIUM, HARD.");
+            }
+            else
+                throw new QuestionNotFound("0 questions with difficulty: "+ difficulty +".");
         }
         else
         {
-            throw new Exception("Question with difficulty " + difficulty + " don't exist yet.");
-            //throw QuestionNotFound exception
+            return questionList;
         }
     }
-    */
-    @PostMapping("/questions")
+
+    @PostMapping("/")
     @Transactional
     public Question saveQuestion(@RequestBody Question question) {
 
@@ -72,7 +76,7 @@ public class QuestionRestController {
 
     }
 
-    @DeleteMapping("/questions/{question_id}")
+    @DeleteMapping("/{question_id}")
     @Transactional
     public void deleteQuestion(@PathVariable int question_id) {
 
